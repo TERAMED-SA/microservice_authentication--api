@@ -2,7 +2,7 @@ using microservice_authentication__api.src.Domain.Entities;
 using microservice_authentication__api.src.Infrastructure.Auth;
 using Microsoft.AspNetCore.Identity;
 
-namespace microservice_authentication__api.src.Infrastructure.Data
+namespace microservice_authentication__api.src.Infrastructure.Persistence.Data
 {
     public class SeedData
     {

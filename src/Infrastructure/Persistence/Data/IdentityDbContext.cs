@@ -6,7 +6,7 @@ using microservice_authentication__api.src.Domain.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace microservice_authentication__api.src.Infrastructure.Persitence.Data
+namespace microservice_authentication__api.src.Infrastructure.Persistence.Data
 {
     public class IdentityDbContext : IdentityDbContext<User>
     {

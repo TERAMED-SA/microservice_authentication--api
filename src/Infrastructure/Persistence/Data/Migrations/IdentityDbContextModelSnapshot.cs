@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using microservice_authentication__api.src.Infrastructure.Persitence.Data;
+using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 
 #nullable disable
 
-namespace microservice_authentication__api.Infrastructure.Persistence.Data.Migrations
+namespace microservice_authentication__api.Src.Infrastructure.Persistence.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
     partial class IdentityDbContextModelSnapshot : ModelSnapshot

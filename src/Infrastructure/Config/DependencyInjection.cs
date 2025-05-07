@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using microservice_authentication__api.src.Domain.Entities;
 using microservice_authentication__api.src.Infrastructure.Auth;
-using microservice_authentication__api.src.Infrastructure.Persitence.Data;
+using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using IdentityDbContext = microservice_authentication__api.src.Infrastructure.Persitence.Data.IdentityDbContext;
+using IdentityDbContext = microservice_authentication__api.src.Infrastructure.Persistence.Data.IdentityDbContext;
 
 namespace microservice_authentication__api.src.Infrastructure.Config
 {
@@ -26,7 +27,7 @@ namespace microservice_authentication__api.src.Infrastructure.Config
                 options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
             });
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<User, IdentityRole>()
                     .AddEntityFrameworkStores<IdentityDbContext>()
                     .AddDefaultTokenProviders();
 

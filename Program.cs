@@ -1,7 +1,7 @@
 using dotenv.net;
 using microservice_authentication__api.src.Domain.Entities;
 using microservice_authentication__api.src.Infrastructure.Config;
-using microservice_authentication__api.src.Infrastructure.Data;
+using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 DotEnv.Load();
