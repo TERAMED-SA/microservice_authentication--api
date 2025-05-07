@@ -1,0 +1,6 @@
+@microservice_authentication__api_HostAddress = http://localhost:5146
+
+GET {{microservice_authentication__api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
