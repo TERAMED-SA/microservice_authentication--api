@@ -29,6 +29,7 @@ namespace microservice_authentication__api.src.Infrastructure.Auth
             var claims = new List<Claim>
         {
             new("id", user.Id),
+            new(ClaimTypes.Name, user.UserName!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

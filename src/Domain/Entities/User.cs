@@ -11,6 +11,7 @@ namespace microservice_authentication__api.src.Domain.Entities
     {
         public required string FirstName { get; set; }
         public required string LastName { get; set; }
+        public required string ExternalReferenceId { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime CreatedAt { get; set; }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]

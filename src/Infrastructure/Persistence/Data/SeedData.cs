@@ -10,6 +10,17 @@ namespace microservice_authentication__api.src.Infrastructure.Persistence.Data
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
+            // Lista dos roles que precisas no sistema
+            string[] roles = [RolesNames.Admin, RolesNames.Professional, RolesNames.Patient, RolesNames.Manager, RolesNames.Scheduling, RolesNames.Appointment];
+
+            // Criar roles se não existirem
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
             // Verifique se a role "admin" já existe, caso contrário, crie-a
             var roleExist = await roleManager.RoleExistsAsync(RolesNames.Admin);
             if (!roleExist)
@@ -21,13 +32,16 @@ namespace microservice_authentication__api.src.Infrastructure.Persistence.Data
             var user = await userManager.FindByEmailAsync("admin@admin.com");
             if (user == null)
             {
+                if (await userManager.FindByNameAsync("945213730") != null) return;
+
                 // Crie o usuário admin com senha padrão
                 user = new User
                 {
                     UserName = "945213730",
                     Email = "admin@admin.com",
                     FirstName = "Cristiano",
-                    LastName = "Alberto"
+                    LastName = "Alberto",
+                    ExternalReferenceId = "xxx-xxxx-xxxx",
                 };
 
                 var result = await userManager.CreateAsync(user, "Admin123!");

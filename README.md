@@ -4,6 +4,8 @@
 
 A Microservice Authentication API é um microserviço desenvolvido em .NET para autenticação e autorização de usuários. Ele utiliza tecnologias como Identity Framework, JWT para autenticação baseada em tokens, e MySQL como banco de dados.
 
+---
+
 ## Tecnologias Utilizadas
 
 - **.NET 9.0** ou superior
@@ -12,79 +14,130 @@ A Microservice Authentication API é um microserviço desenvolvido em .NET para 
 - **JWT** para tokens de autenticação
 - **Swagger** para documentação interativa
 - **Docker** para facilitar a execução do ambiente
+- **Nginx** (proxy reverso)
+
+---
 
 ## Estrutura do Projeto
 
-### Diretórios Principais
+- **src/API/Controller/v1/AuthController.cs**: Endpoints de autenticação.
+- **src/Application/Services/AuthenticationService.cs**: Lógica de autenticação e registro.
+- **src/Infrastructure/Auth/JwtAuthService.cs**: Geração e validação de tokens JWT.
+- **src/Infrastructure/Persistence/Data/IdentityDbContext.cs**: Contexto do banco de dados Identity.
+- **src/Infrastructure/Persistence/Data/SeedData.cs**: Seed inicial de roles e usuário admin.
+- **src/Infrastructure/External/Notification/NotificationService.cs**: Integração para envio de SMS.
 
-- **`src/API/Controller/v1/AuthController.cs`**: Controlador principal para endpoints de autenticação.
-- **`src/Application/Services/AuthenticationService.cs`**: Implementação dos serviços de autenticação.
-- **`src/Infrastructure/Auth/JwtAuthService.cs`**: Serviço para geração e validação de tokens JWT.
-- **`src/Infrastructure/Persitence/Data/IdentityDbContext.cs`**: Contexto do banco de dados para gerenciar usuários e roles.
+---
 
-## Endpoints Disponíveis
+## Endpoints Principais
 
-### Autenticação
+### 1. Login
 
-1. **Registrar Usuário**
+- **POST** `/api/v1/auth/sign-in`
+- **Body**:
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
+- **Retorno**: Token JWT ou mensagem de erro.
 
-   - **Rota**: `POST /api/v1/auth/signup`
-   - **Descrição**: Cria uma nova conta de usuário.
-   - **Payload**:
-     ```json
-     {
-       "username": "string",
-       "password": "string",
-       "email": "string"
-     }
-     ```
+---
 
-2. **Login**
+### 2. Dados do Usuário Autenticado
 
-   - **Rota**: `POST /api/v1/auth/signin`
-   - **Descrição**: Autentica um usuário e retorna um token JWT.
-   - **Payload**:
-     ```json
-     {
-       "username": "string",
-       "password": "string"
-     }
-     ```
+- **GET** `/api/v1/auth/me`
+- **Headers**:
+  ```
+  Authorization: Bearer <token>
+  ```
+- **Retorno**: Dados do usuário autenticado.
 
-3. **Obter Informações do Usuário**
-   - **Rota**: `GET /api/v1/auth/me`
-   - **Descrição**: Retorna informações do usuário autenticado.
-   - **Cabeçalho**:
-     ```
-     Authorization: Bearer <token>
-     ```
+---
 
-## Configuração e Execução
+### 3. Cadastro de Usuários
 
-### Passo 1: Configurar o Arquivo `.env`
+- **POST** `/api/v1/auth/register/admin` (apenas Admin)
+- **POST** `/api/v1/auth/register/manager` (apenas Admin)
+- **POST** `/api/v1/auth/register/patient`
+- **POST** `/api/v1/auth/register/professional`
+- **Body**:
+  ```json
+  {
+    "firstName": "string",
+    "lastName": "string",
+    "userName": "string",
+    "email": "string",
+    "externalReferenceId": "string"
+  }
+  ```
 
-Crie um arquivo `.env` na raiz do projeto com as variáveis que estão dentro do arquivo "env.example"
+---
 
-### Passo 2: Executar com Docker
+### 4. Autenticação em Dois Fatores (2FA)
 
-1. Construa e inicie os contêineres:
+- **POST** `/api/v1/auth/enable-2fa`
+  ```json
+  { "username": "string", "phoneNumber": "string" }
+  ```
+- **POST** `/api/v1/auth/confirm-2fa`
+  ```json
+  { "username": "string", "code": "string" }
+  ```
+- **POST** `/api/v1/auth/verify-2fa`
+  ```json
+  { "username": "string", "code": "string" }
+  ```
 
-   ```sh
-   docker-compose up --build
+---
 
-   ```
+### 5. Recuperação e Troca de Senha
 
-2. Acesse a API
-   http://localhost:5007.
+- **POST** `/api/v1/auth/requestResetPassword`
+  ```json
+  { "username": "string" }
+  ```
+- **POST** `/api/v1/auth/resetPassword`
+  ```json
+  { "username": "string", "code": "string", "newPassword": "string" }
+  ```
+- **POST** `/api/v1/auth/changePassword` (autenticado)
+  ```json
+  { "currentPassword": "string", "newPassword": "string" }
+  ```
 
-3. Acesse o NGINX
-   http://localhost:8080
+---
 
-### Passo 3: Executar Localmente
+## Como Executar
 
-1. Certifique-se de que o MySQL está rodando.
-2. Execute o projeto:
+### 1. Configuração do `.env`
+
+Crie um arquivo `.env` na raiz do projeto com as variáveis do arquivo `env.example`.
+
+### 2. Executando com Docker
 
 ```sh
-  dotnet run
+docker-compose up --build
 ```
+
+- API: http://localhost:5007
+- NGINX: http://localhost:8080
+
+### 3. Executando Localmente
+
+- Certifique-se que o MySQL está rodando.
+- Execute:
+  ```sh
+  dotnet run
+  ```
+
+---
+
+## Observações
+
+- O seed inicial cria um usuário admin padrão (`admin@admin.com` / senha: `Admin123!`).
+- O serviço de notificação (SMS) depende da variável `NOTIFICATION_URL`.
+- O projeto já está pronto para versionamento de API e uso de políticas de autorização por role.
+
+---

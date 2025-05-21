@@ -61,10 +61,9 @@ namespace microservice_authentication__api.src.API.Controller.v1
         }
 
         /// <summary>
-        /// Cria um novo Patient (apenas para Admins ou Managers).
+        /// Cria um novo Patient.
         /// </summary>
         [HttpPost("register/patient")]
-        [Authorize(Policy = PolicyNames.OnlyManager)]
         public async Task<IActionResult> RegisterPatient([FromBody] SignUpRequestDTO dto)
         {
             var result = await _authenticationService.RegisterPatientAsync(dto);
@@ -72,13 +71,69 @@ namespace microservice_authentication__api.src.API.Controller.v1
         }
 
         /// <summary>
-        /// Cria um novo Professional (apenas para Admins ou Managers).
+        /// Cria um novo Professional
         /// </summary>
         [HttpPost("register/professional")]
-        [Authorize(Policy = PolicyNames.OnlyManager)]
         public async Task<IActionResult> RegisterProfessional([FromBody] SignUpRequestDTO dto)
         {
             var result = await _authenticationService.RegisterProfessionalAsync(dto);
+            return StatusCode(result.Code, result);
+        }
+        /// <summary>
+        /// Activar o 2f
+        /// </summary
+        [HttpPost("enable-2fa")]
+        public async Task<IActionResult> EnableTwoFactor([FromBody] TwoFactorRequestDTO dto)
+        {
+            var result = await _authenticationService.EnableTwoFactorAsync(dto.Username, dto.PhoneNumber);
+            return StatusCode(result.Code, result);
+        }
+
+        /// <summary>
+        /// Confirmar o 2f
+        /// </summary
+        [HttpPost("confirm-2fa")]
+        public async Task<IActionResult> ConfirmTwoFactor([FromBody] TwoFactorCodeDTO dto)
+        {
+            var result = await _authenticationService.ConfirmTwoFactorPhoneAsync(dto.Username, dto.Code);
+            return StatusCode(result.Code, result);
+        }
+
+        /// <summary>
+        /// Confirmar o codigo do 2f
+        /// </summary
+        [HttpPost("verify-2fa")]
+        public async Task<IActionResult> VerifyTwoFactor([FromBody] TwoFactorCodeDTO dto)
+        {
+            var result = await _authenticationService.VerifyTwoFactorCodeAsync(dto.Username, dto.Code);
+            return StatusCode(result.Code, result);
+        }
+
+        /// <summary>
+        /// Solicita a recuperação de senha (envia código por SMS ou email)
+        /// </summary>
+        [HttpPost("requestResetPassword")]
+        public async Task<IActionResult> RequestRecovery([FromBody] PasswordRecoveryRequestDTO dto)
+        {
+            var result = await _authenticationService.RequestPasswordRecoveryAsync(dto.Username);
+            return StatusCode(result.Code, result);
+        }
+
+        /// <summary>
+        /// Reseta a senha com base no código enviado
+        /// </summary>
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] PasswordResetDTO dto)
+        {
+            var result = await _authenticationService.ResetPasswordAsync(dto.Username, dto.Code, dto.NewPassword);
+            return StatusCode(result.Code, result);
+        }
+        [HttpPost("changePassword")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto)
+        {
+            var username = User.Identity!.Name;
+            var result = await _authenticationService.ChangePasswordAsync(username!, dto.CurrentPassword, dto.NewPassword);
             return StatusCode(result.Code, result);
         }
     }

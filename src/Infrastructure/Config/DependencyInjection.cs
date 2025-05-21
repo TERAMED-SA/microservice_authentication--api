@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using microservice_authentication__api.src.Application.Interfaces;
+using microservice_authentication__api.src.Application.Services;
 using microservice_authentication__api.src.Domain.Entities;
 using microservice_authentication__api.src.Infrastructure.Auth;
+using microservice_authentication__api.src.Infrastructure.External;
+using microservice_authentication__api.src.Infrastructure.External.Notification;
 using microservice_authentication__api.src.Infrastructure.Persistence.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -41,26 +46,34 @@ namespace microservice_authentication__api.src.Infrastructure.Config
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.ReportApiVersions = true;
             });
-
+            services.Configure<DataProtectionTokenProviderOptions>(opt =>
+            {
+                opt.TokenLifespan = TimeSpan.FromMinutes(5);
+            });
             return services;
         }
 
         public static IServiceCollection AddJwtAuth(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication("Bearer")
-                    .AddJwtBearer(options =>
-                    {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
-                            ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-                            ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
-                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!))
-                        };
-                    });
+
+            services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                ValidAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET_KEY")!))
+            };
+        });
 
             return services;
         }
@@ -105,6 +118,16 @@ namespace microservice_authentication__api.src.Infrastructure.Config
                 .AddPolicy(PolicyNames.OnlyManager, policy => policy.RequireRole(RolesNames.Admin, RolesNames.Manager))
                 .AddPolicy(PolicyNames.OnlyProfessional, policy => policy.RequireRole(RolesNames.Professional))
                 .AddPolicy(PolicyNames.OnlyPatient, policy => policy.RequireRole(RolesNames.Patient));
+
+            return services;
+        }
+
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<ITokenService, JwtAuthService>();
+            services.AddScoped<IExternalApi, ExternalApiBase>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services;
         }

@@ -17,5 +17,14 @@ namespace microservice_authentication__api.src.Application.Services
         Task<Result<string>> RegisterManagerAsync(SignUpRequestDTO dto);
         Task<Result<string>> RegisterPatientAsync(SignUpRequestDTO dto);
         Task<Result<string>> RegisterProfessionalAsync(SignUpRequestDTO dto);
+
+        Task<Result<string>> VerifyTwoFactorCodeAsync(string username, string code);
+        Task<Result<string>> EnableTwoFactorAsync(string username, string phoneNumber);
+        Task<Result<string>> ConfirmTwoFactorPhoneAsync(string username, string code);
+
+        Task<Result<string>> ChangePasswordAsync(string username, string currentPassword, string newPassword);
+        Task<Result<string>> RequestPasswordRecoveryAsync(string username);
+        Task<Result<string>> ResetPasswordAsync(string username, string code, string newPassword);
+
     }
 }

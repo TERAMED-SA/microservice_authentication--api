@@ -8,7 +8,7 @@ using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 
 #nullable disable
 
-namespace microservice_authentication__api.Src.Infrastructure.Persistence.Data.Migrations
+namespace microservice_authentication__api.src.Infrastructure.Persistence.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
     partial class IdentityDbContextModelSnapshot : ModelSnapshot
@@ -178,6 +178,10 @@ namespace microservice_authentication__api.Src.Infrastructure.Persistence.Data.M
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ExternalReferenceId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

@@ -10,7 +10,8 @@ builder.Services
     .AddAppServices(builder.Configuration)
     .AddJwtAuth(builder.Configuration)
     .AddSwaggerWithJwt()
-    .AddPolicies();
+    .AddPolicies()
+    .AddInfrastructure();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {

@@ -9,11 +9,11 @@ using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 
 #nullable disable
 
-namespace microservice_authentication__api.Src.Infrastructure.Persistence.Data.Migrations
+namespace microservice_authentication__api.src.Infrastructure.Persistence.Data.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20250507234405_FirtMigration")]
-    partial class FirtMigration
+    [Migration("20250520153302_FirstMigration")]
+    partial class FirstMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -181,6 +181,10 @@ namespace microservice_authentication__api.Src.Infrastructure.Persistence.Data.M
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ExternalReferenceId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
