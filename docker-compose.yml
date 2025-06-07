@@ -1,19 +1,42 @@
+version: "3.9"
+
 services:
   microservice_authentication-api:
     build: .
-    image: microservice_authentication-api # Nome da imagem gerada pelo build
+    image: microservice_authentication-api
     ports:
-      - "5007:5007" # Mapeia a porta do contêiner para o host
-    volumes:
-      - .:/app
-      - /app/bin
+      - "5007:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - MYSQL_HOST=seu_host_mysql_externo # Aqui você usa o host externo do seu banco
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DATABASE=autenticacaoDB
+      - MYSQL_CONNECTION_STRING=server=db;userid=baika;password=baikaauth;database=autenticacaoDB;
+      - JWT_SECRET_KEY=23ffa07710703949e0cf010fbeb5a84f470ab62c7ac9e9a593ef8674176ce561
+      - JWT_ISSUER=ms-authentication
+      - JWT_AUDIENCE=authentication
+      - JWT_EXPIRE_MINUTES=1440
+      - RABBITMQ_CONNECTION_STRING=amqps://vwsjvuxn:ETVjObxd0LWal0pxMvg4wmPGLbJQNw0R@jackal.rmq.cloudamqp.com/vwsjvuxn
+      - NOTIFICATION_URL=https://notification.baikapay.tech/notification/v1.0.0/sms
       - DOTNET_RUNNING_IN_CONTAINER=true
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: baikaauth
+      MYSQL_DATABASE: autenticacaoDB
+      MYSQL_USER: baika
+      MYSQL_PASSWORD: baikaauth
+    ports:
+      - "33306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   nginx:
     image: nginx:latest

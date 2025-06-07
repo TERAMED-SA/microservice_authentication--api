@@ -4,6 +4,7 @@ using microservice_authentication__api.src.Infrastructure.Config;
 using microservice_authentication__api.src.Infrastructure.Persistence.Data;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 DotEnv.Load();
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
@@ -19,7 +20,12 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 var app = builder.Build();
-
+//Inicializa as migrates
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<IdentityDbContext>();
+    dbContext.Database.Migrate();
+}
 // Inicialização do banco e seed do usuário admin
 using (var scope = app.Services.CreateScope())
 {
@@ -28,11 +34,12 @@ using (var scope = app.Services.CreateScope())
     await SeedData.Initialize(services, userManager);
 }
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+    c.RoutePrefix = "swagger";  // Acesso via /swagger
+});
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
